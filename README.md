@@ -1,132 +1,228 @@
-# Masa Rica
+# Masa Rica – Operia
 
-Sistema web de gestión y venta de productos para Masa Rica, emprendimiento familiar dedicado a la elaboración y comercialización de empanadas y preparaciones tradicionales.
+Sistema web de gestión y venta de productos desarrollado para Masa Rica, un emprendimiento familiar dedicado a la elaboración y comercialización de empanadas y preparaciones tradicionales.
+
+El proyecto permite administrar las ventas y operaciones del negocio mediante una aplicación web desarrollada con Django.
 
 ## Características principales
 
-- Catálogo de productos y categorías.
+- Catálogo de productos organizado por categorías.
 - Carrito de compras con cálculo automático de precios.
 - Registro e inicio de sesión de clientes.
 - Gestión y seguimiento de pedidos.
-- Panel de administración.
-- Control de inventario.
-- Integración con métodos de pago.
-- Notificaciones automáticas por correo electrónico.
-- Validación de formularios.
+- Panel administrativo para el personal autorizado.
+- Control de inventario e insumos.
+- Gestión de proveedores.
+- Integración con métodos de pago, incluyendo Transbank Webpay.
+- Notificaciones de pedidos mediante correo electrónico.
+- Validación de formularios y control de permisos.
+- Reportes de gestión.
 - Base de datos SQLite.
-- Gestión de usuarios y permisos.
 
 ## Tecnologías utilizadas
 
-- Python
-- Django 6.0.7
-- SQLite
-- HTML5
-- CSS3
-- JavaScript
-- WhiteNoise
-- Transbank SDK
-- Gmail SMTP
+- Python 3.12 o superior.
+- Django 6.0.7.
+- SQLite.
+- HTML5.
+- CSS3.
+- JavaScript.
+- WhiteNoise.
+- Transbank SDK.
+- Gmail SMTP.
 
 ## Estructura del proyecto
 
 ```text
 Masa-Rica/
-│
 ├── config/
 ├── web/
 │   ├── migrations/
 │   ├── static/
 │   └── templates/
-│
 ├── productos_iniciales.json
 ├── manage.py
 ├── requirements.txt
 ├── .env.example
-└── .gitignore
+├── .gitignore
+└── README.md
 ```
 
-## Instalación
+## Requisitos previos
 
-### 1. Descargar el proyecto
+- Tener instalado Python 3.12 o superior.
+- Tener acceso a una terminal, como PowerShell o la terminal de Visual Studio Code.
+- Disponer de conexión a internet para instalar las dependencias.
 
-Descargar o clonar este repositorio.
+## Instalación del proyecto
 
-### 2. Crear un entorno virtual
+### 1. Descargar el repositorio
 
-```bash
+Descargar el proyecto desde GitHub utilizando la opción **Code → Download ZIP**, o clonarlo mediante Git.
+
+Extraer el archivo ZIP y abrir en Visual Studio Code la carpeta que contiene `manage.py`.
+
+### 2. Crear el entorno virtual
+
+Ejecutar:
+
+```powershell
 python -m venv .venv
 ```
 
-Activar el entorno virtual:
+Activar el entorno virtual en Windows PowerShell:
 
-Windows:
-
-```bash
-.venv\Scripts\activate
+```powershell
+.\.venv\Scripts\Activate.ps1
 ```
 
-Linux:
+En Windows CMD:
+
+```cmd
+.venv\Scripts\activate.bat
+```
+
+En Linux o macOS:
 
 ```bash
 source .venv/bin/activate
 ```
 
-### 3. Instalar dependencias
+### 3. Instalar las dependencias
 
-```bash
-pip install -r requirements.txt
+Con el entorno virtual activado:
+
+```powershell
+python -m pip install -r requirements.txt
 ```
 
 ### 4. Configurar las variables de entorno
 
-Crear un archivo `.env` a partir de `.env.example`.
+Crear una copia del archivo `.env.example` con el nombre `.env`.
 
-Completar las variables necesarias con las credenciales propias del entorno.
+En PowerShell:
 
-No compartir ni publicar el archivo `.env`.
+```powershell
+Copy-Item .env.example .env
+```
 
-### 5. Crear las tablas de la base de datos
+El archivo `.env` debe contener las variables de configuración del proyecto:
 
-```bash
+```dotenv
+DJANGO_SECRET_KEY=REEMPLAZAR_CON_UNA_CLAVE_SEGURA
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+MASA_RICA_EMAIL=
+MASA_RICA_EMAIL_PASSWORD=
+MASA_RICA_PEDIDOS_EMAIL=
+```
+
+Para generar una clave secreta aleatoria, ejecutar:
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+Copiar el resultado y reemplazar `REEMPLAZAR_CON_UNA_CLAVE_SEGURA` en el archivo `.env`.
+
+Las variables de correo electrónico son necesarias para habilitar las notificaciones mediante Gmail SMTP. Para una instalación local de prueba pueden permanecer vacías, aunque el envío de correos no estará disponible sin configurarlas.
+
+**Nunca publicar el archivo `.env` ni compartir claves privadas.**
+
+### 5. Crear la base de datos
+
+Ejecutar:
+
+```powershell
 python manage.py migrate
 ```
 
+Esto creará las tablas necesarias en SQLite.
+
 ### 6. Cargar los productos iniciales
 
-En una instalación nueva, cargar el catálogo original:
+En una instalación nueva, ejecutar:
 
-```bash
+```powershell
 python manage.py loaddata productos_iniciales.json
 ```
 
-El archivo contiene los 27 productos iniciales de Masa Rica.
+Este archivo contiene los **27 productos iniciales de Masa Rica**.
 
-### 7. Crear un administrador
+No se recomienda cargar esta información en una base de datos que ya tenga productos, sin revisar previamente los identificadores existentes.
 
-```bash
+### 7. Crear una cuenta de administrador
+
+Ejecutar:
+
+```powershell
 python manage.py createsuperuser
 ```
 
+Ingresar el nombre de usuario, correo electrónico y contraseña solicitados.
+
 ### 8. Ejecutar el servidor
 
-```bash
+Ejecutar:
+
+```powershell
 python manage.py runserver
 ```
 
-Abrir en el navegador:
+Abrir la aplicación en el navegador:
 
 http://127.0.0.1:8000/
 
+Para ingresar al administrador de Django:
+
+http://127.0.0.1:8000/admin/
+
+## Comprobaciones del proyecto
+
+Verificar la configuración de Django:
+
+```powershell
+python manage.py check
+```
+
+Verificar si existen cambios de modelos pendientes de migración:
+
+```powershell
+python manage.py makemigrations --check --dry-run
+```
+
+Verificar que todas las migraciones estén aplicadas:
+
+```powershell
+python manage.py migrate --check
+```
+
 ## Seguridad
 
-- Las credenciales se administran mediante variables de entorno.
-- El archivo `.env` no debe publicarse.
-- Las bases de datos locales y los respaldos están excluidos del repositorio.
-- Las contraseñas y configuraciones privadas no deben compartirse.
+- Las claves y credenciales privadas se almacenan mediante variables de entorno.
+- El archivo `.env` está excluido del repositorio.
+- Las bases de datos locales y los respaldos no deben publicarse.
+- Se utilizan mecanismos de autenticación y permisos de Django.
+- Los archivos privados y los datos sensibles deben permanecer fuera del repositorio público.
 
-## Proyecto
+## Pruebas realizadas
 
-Masa Rica es un proyecto desarrollado para apoyar la gestión y operación de un emprendimiento familiar, facilitando la administración de productos, clientes y pedidos.
+Se realizó una instalación nueva descargando el proyecto desde GitHub y se comprobó:
 
-**Repositorio:** joseovalle2004-gif/Masa-Rica
+- Instalación de dependencias.
+- Creación de las tablas SQLite.
+- Importación de los 27 productos iniciales.
+- Ejecución de la página web.
+- Acceso al panel de administración.
+- Acceso a las secciones internas de Operia.
+- Comprobación de configuración y migraciones sin errores.
+
+## Sitio web
+
+**Aplicación publicada:** https://jose21.pythonanywhere.com/
+
+**Repositorio:** https://github.com/joseovalle2004-gif/Masa-Rica
+
+## Objetivo del proyecto
+
+Masa Rica – Operia busca facilitar la digitalización de un emprendimiento familiar mediante herramientas para la venta de productos, administración de pedidos, gestión de inventario y apoyo a la toma de decisiones.
