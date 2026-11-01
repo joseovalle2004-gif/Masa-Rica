@@ -1,0 +1,299 @@
+[
+  {
+    "model": "web.producto",
+    "pk": 1,
+    "fields": {
+      "nombre": "Empanada de pino",
+      "categoria": "empanadas",
+      "tipo_venta": "diaria",
+      "precio": 2800,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 2,
+    "fields": {
+      "nombre": "Empanada de queso",
+      "categoria": "empanadas",
+      "tipo_venta": "diaria",
+      "precio": 2600,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 3,
+    "fields": {
+      "nombre": "Empanada de camaron queso",
+      "categoria": "empanadas",
+      "tipo_venta": "diaria",
+      "precio": 2900,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 4,
+    "fields": {
+      "nombre": "Coca Cola 500 ml",
+      "categoria": "bebidas",
+      "tipo_venta": "diaria",
+      "precio": 1200,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 5,
+    "fields": {
+      "nombre": "Pepsi 500 ml",
+      "categoria": "bebidas",
+      "tipo_venta": "diaria",
+      "precio": 1200,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 6,
+    "fields": {
+      "nombre": "Sopaipilla Frita",
+      "categoria": "sopaipillas",
+      "tipo_venta": "diaria",
+      "precio": 2500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 7,
+    "fields": {
+      "nombre": "Sopaipilla Pasada",
+      "categoria": "sopaipillas_pasadas",
+      "tipo_venta": "diaria",
+      "precio": 3000,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 8,
+    "fields": {
+      "nombre": "Humitas tradicional",
+      "categoria": "humitas",
+      "tipo_venta": "diaria",
+      "precio": 3500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 9,
+    "fields": {
+      "nombre": "Pastel de choclo individual",
+      "categoria": "pastel_choclo",
+      "tipo_venta": "diaria",
+      "precio": 5500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 10,
+    "fields": {
+      "nombre": "Mini empenadas de queso (12Und)",
+      "categoria": "mini_empanadas",
+      "tipo_venta": "encargo",
+      "precio": 6500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 11,
+    "fields": {
+      "nombre": "Mini empenadas de pino (12Und)",
+      "categoria": "mini_empanadas",
+      "tipo_venta": "encargo",
+      "precio": 7200,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 12,
+    "fields": {
+      "nombre": "Mini empanadas de camaron queso (12Und)",
+      "categoria": "mini_empanadas",
+      "tipo_venta": "encargo",
+      "precio": 6500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 13,
+    "fields": {
+      "nombre": "Mini pizzas (12Und)",
+      "categoria": "mini_pizzas",
+      "tipo_venta": "encargo",
+      "precio": 8000,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 14,
+    "fields": {
+      "nombre": "Cóctel surtido (30Und)",
+      "categoria": "cocteles",
+      "tipo_venta": "encargo",
+      "precio": 18000,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 15,
+    "fields": {
+      "nombre": "Pavo relleno",
+      "categoria": "pavo_relleno",
+      "tipo_venta": "encargo",
+      "precio": 20000,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 16,
+    "fields": {
+      "nombre": "Empenadas napolitana",
+      "categoria": "empanadas",
+      "tipo_venta": "diaria",
+      "precio": 2000,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 17,
+    "fields": {
+      "nombre": "Empanada de quesochampiñon",
+      "categoria": "empanadas",
+      "tipo_venta": "diaria",
+      "precio": 2300,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 18,
+    "fields": {
+      "nombre": "Pastel de choclo tradicional",
+      "categoria": "pastel_choclo",
+      "tipo_venta": "diaria",
+      "precio": 6000,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 19,
+    "fields": {
+      "nombre": "Pastel de Choclo con Queso",
+      "categoria": "pastel_choclo",
+      "tipo_venta": "diaria",
+      "precio": 4500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 20,
+    "fields": {
+      "nombre": "Sopaipilla con Pebre",
+      "categoria": "sopaipillas",
+      "tipo_venta": "diaria",
+      "precio": 3000,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 21,
+    "fields": {
+      "nombre": "Sopaipilla con Queso",
+      "categoria": "sopaipillas",
+      "tipo_venta": "diaria",
+      "precio": 3500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 22,
+    "fields": {
+      "nombre": "Sopaipilla con Palta",
+      "categoria": "sopaipillas",
+      "tipo_venta": "diaria",
+      "precio": 3500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 23,
+    "fields": {
+      "nombre": "Coca-Cola Zero 500 ml",
+      "categoria": "bebidas",
+      "tipo_venta": "diaria",
+      "precio": 1500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 24,
+    "fields": {
+      "nombre": "Sprite 500 ml",
+      "categoria": "bebidas",
+      "tipo_venta": "diaria",
+      "precio": 1500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 25,
+    "fields": {
+      "nombre": "Fanta 500 ml",
+      "categoria": "bebidas",
+      "tipo_venta": "diaria",
+      "precio": 1500,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 26,
+    "fields": {
+      "nombre": "Agua Mineral sin Gas 500 ml",
+      "categoria": "bebidas",
+      "tipo_venta": "diaria",
+      "precio": 1200,
+      "disponible": true
+    }
+  },
+  {
+    "model": "web.producto",
+    "pk": 27,
+    "fields": {
+      "nombre": "Agua Mineral con Gas 500 ml",
+      "categoria": "bebidas",
+      "tipo_venta": "diaria",
+      "precio": 1200,
+      "disponible": true
+    }
+  }
+]
