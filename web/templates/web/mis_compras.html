@@ -1,0 +1,415 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Consulta tus pedidos y compras realizadas en Masa Rica."
+    >
+
+    <title>Mis compras | Masa Rica</title>
+    <link
+        rel="stylesheet"
+        href="{% static 'web/css/mis_compras.css' %}?v=2"
+    >
+</head>
+
+<body>
+
+    <header class="encabezado">
+
+        <div class="contenedor navegacion">
+
+            <a href="{% url 'inicio' %}" class="logo">
+                Masa <span>Rica</span>
+            </a>
+
+            <div class="navegacion-acciones">
+
+                <span class="nombre-cliente">
+                    Hola, {{ user.first_name|default:user.username }}
+                </span>
+
+                <a href="{% url 'inicio' %}" class="boton-inicio">
+                    ← Volver al inicio
+                </a>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <main class="contenedor">
+
+        
+
+        <section class="cabecera-pagina">
+
+            <p class="etiqueta">
+                TU HISTORIAL EN MASA RICA
+            </p>
+
+            <h1>Mis compras</h1>
+
+            <p>
+                Consulta tus pedidos, revisa los productos
+                que compraste y conoce el estado de preparación
+                de cada pedido.
+            </p>
+
+        </section>
+
+        {% if pedidos %}
+
+            <div class="resumen">
+
+                <h2>
+                    Historial de pedidos
+                </h2>
+
+                <span class="contador">
+                    {{ pedidos|length }}
+                    pedido{{ pedidos|length|pluralize }}
+                </span>
+
+            </div>
+
+
+            <section class="lista-pedidos">
+
+                {% for pedido in pedidos %}
+
+                    <article class="pedido">
+
+                        <div class="pedido-cabecera">
+
+                            <div>
+
+                                <h2 class="pedido-numero">
+                                    Pedido #{{ pedido.id }}
+                                </h2>
+
+                                <p class="pedido-fecha">
+                                    Realizado el
+                                    {{ pedido.fecha_pedido|date:"d/m/Y" }}
+                                    a las
+                                    {{ pedido.fecha_pedido|date:"H:i" }}
+                                </p>
+
+                            </div>
+
+                            <span class="estado estado-{{ pedido.estado }}">
+
+                                {% if pedido.estado == "pendiente" %}
+
+                                    Pendiente
+
+                                {% elif pedido.estado == "preparacion" %}
+
+                                    En preparación
+
+                                {% elif pedido.estado == "coccion" %}
+
+                                    En cocción
+
+                                {% elif pedido.estado == "listo" %}
+
+                                    Listo para retirar
+
+                                {% elif pedido.estado == "entregado" %}
+
+                                    Entregado
+
+                                {% elif pedido.estado == "cancelado" %}
+
+                                    Cancelado
+
+                                {% else %}
+
+                                    {{ pedido.get_estado_display }}
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                        <div class="pedido-cuerpo">
+
+                            <h3 class="subtitulo">
+                                Productos del pedido
+                            </h3>
+
+
+                            
+
+                            <div class="tabla-contenedor">
+
+                                <table class="tabla-productos">
+
+                                    <thead>
+
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio unitario</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        {% for detalle in pedido.detalles.all %}
+
+                                            <tr>
+
+                                                <td class="producto-nombre">
+                                                    {{ detalle.producto.nombre }}
+                                                </td>
+
+                                                <td>
+                                                    {{ detalle.cantidad }}
+                                                </td>
+
+                                                <td>
+                                                    ${{ detalle.precio_unitario|floatformat:0 }}
+                                                </td>
+
+                                                <td>
+                                                    ${{ detalle.subtotal|floatformat:0 }}
+                                                </td>
+
+                                            </tr>
+
+                                        {% empty %}
+
+                                            <tr>
+
+                                                <td colspan="4">
+                                                    No hay productos registrados
+                                                    en este pedido.
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                            <div class="pedido-informacion">
+
+
+                                
+
+                                <div class="informacion-item">
+
+                                    <span class="informacion-etiqueta">
+                                        Método de pago
+                                    </span>
+
+                                    <span class="informacion-valor">
+                                        {{ pedido.get_metodo_pago_display }}
+                                    </span>
+
+                                </div>
+
+
+                                
+
+                                <div class="informacion-item">
+
+                                    <span class="informacion-etiqueta">
+                                        Estado del pago
+                                    </span>
+
+                                    {% if pedido.estado_pago == "confirmado" %}
+
+                                        <span class="informacion-valor pago-confirmado">
+                                            ✓ Pago confirmado
+                                        </span>
+
+                                    {% elif pedido.estado_pago == "en_verificacion" %}
+
+                                        <span class="informacion-valor pago-verificacion">
+                                            ◷ En verificación bancaria
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="informacion-valor pago-pendiente">
+                                            Pago pendiente
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                
+
+                                <div class="informacion-item">
+
+                                    <span class="informacion-etiqueta">
+                                        Tiempo estimado de preparación
+                                    </span>
+
+                                    <span class="informacion-valor">
+
+                                        {% if pedido.minutos_estimados %}
+
+                                            {{ pedido.minutos_estimados }} minutos
+
+                                        {% else %}
+
+                                            Por confirmar
+
+                                        {% endif %}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            {% if pedido.estado == "cancelado" %}
+
+                                <div class="pedido-cancelado-aviso">
+
+                                    Este pedido fue cancelado.
+                                    Si necesitas información,
+                                    comunícate con Masa Rica.
+
+                                </div>
+
+                            {% else %}
+
+                                <div class="progreso-seccion">
+
+                                    <div class="progreso-cabecera">
+
+                                        <h3>
+                                            Estado de tu pedido
+                                        </h3>
+
+                                    </div>
+
+                                    <p class="progreso-etapa">
+
+                                        {% if pedido.estado == "pendiente" %}
+
+                                            Hemos recibido tu pedido.
+
+                                        {% elif pedido.estado == "preparacion" %}
+
+                                            Estamos preparando tu pedido.
+
+                                        {% elif pedido.estado == "coccion" %}
+
+                                            Tu pedido está en cocción.
+
+                                        {% elif pedido.estado == "listo" %}
+
+                                            ¡Tu pedido está listo para retirar!
+
+                                        {% elif pedido.estado == "entregado" %}
+
+                                            Tu pedido fue entregado.
+                                            ¡Gracias por preferir Masa Rica!
+
+                                        {% endif %}
+
+                                    </p>
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <div class="pedido-pie">
+
+                            <span class="cantidad-productos">
+
+                                {{ pedido.cantidad_productos }}
+                                producto{{ pedido.cantidad_productos|pluralize }}
+                                en total
+
+                            </span>
+
+                            <div class="total">
+
+                                <span>
+                                    Total del pedido:
+                                </span>
+
+                                <strong>
+                                    ${{ pedido.total_pedido|floatformat:0 }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+        {% else %}
+
+            <section class="sin-compras">
+
+                <span class="sin-compras-icono">
+                    🛍️
+                </span>
+
+                <h2>
+                    Todavía no tienes compras registradas
+                </h2>
+
+                <p>
+                    Cuando realices tu primer pedido
+                    en Masa Rica, podrás consultarlo aquí.
+                </p>
+
+                <a
+                    href="{% url 'inicio' %}#productos"
+                    class="boton-productos"
+                >
+                    Explorar productos
+                </a>
+
+            </section>
+
+        {% endif %}
+
+    </main>
+    <footer class="pie-pagina">
+
+        <div class="contenedor">
+
+            <p>
+                &copy; {% now "Y" %} Masa Rica.
+                Todos los derechos reservados.
+            </p>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>

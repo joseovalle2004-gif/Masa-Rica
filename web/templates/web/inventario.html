@@ -1,0 +1,574 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#78221e">
+
+    <title>Inventario | Operia</title>
+
+    <link rel="stylesheet"
+      href="{% static 'web/css/inventario.css' %}?v=6">
+</head>
+
+<body>
+
+    <main class="inventario-contenido">
+
+        <header class="encabezado-panel">
+
+            <p class="inventario-etiqueta">
+                CONTROL DE EXISTENCIAS
+            </p>
+
+            <h1>Gestión de inventario</h1>
+
+            <p>
+                Supervisa los ingredientes y materiales
+                utilizados en la producción de Masa Rica.
+            </p>
+
+        </header>
+
+        {% if messages %}
+
+            <section class="inventario-mensajes"
+                     aria-label="Mensajes del sistema">
+
+                {% for message in messages %}
+
+                    <p role="status">
+                        {{ message }}
+                    </p>
+
+                {% endfor %}
+
+            </section>
+
+        {% endif %}
+
+        <section class="inventario-resumen"
+                 aria-label="Resumen del inventario">
+
+            <article class="tarjeta">
+
+                <h3>Insumos activos</h3>
+
+                <p class="valor">
+                    {{ total_insumos }}
+                </p>
+
+            </article>
+
+            <article class="tarjeta">
+
+                <h3>Alertas de stock</h3>
+
+                <p class="valor">
+                    {{ alertas_inventario }}
+                </p>
+
+            </article>
+
+        </section>
+
+        <section class="inventario-seccion"
+                 aria-labelledby="titulo-registrar-insumo">
+
+            <div class="inventario-seccion-encabezado">
+
+                <div>
+
+                    <h3 id="titulo-registrar-insumo">
+                        Registrar nuevo insumo
+                    </h3>
+
+                    <p>
+                        Agrega ingredientes y materiales
+                        utilizados en la producción de Masa Rica.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <form method="post"
+                  action="{% url 'inventario_operia' %}"
+                  class="inventario-formulario">
+
+                {% csrf_token %}
+
+                {% if formulario.non_field_errors %}
+
+                    <div class="inventario-error" role="alert">
+                        {{ formulario.non_field_errors }}
+                    </div>
+
+                {% endif %}
+
+                <div class="inventario-formulario-grid">
+
+                    {% for campo in formulario %}
+
+                        <div class="inventario-campo">
+
+                            <label for="{{ campo.id_for_label }}">
+                                {{ campo.label }}
+                            </label>
+
+                            {{ campo }}
+
+                            {% if campo.errors %}
+
+                                <div class="inventario-error"
+                                     role="alert">
+                                    {{ campo.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+                <div class="inventario-formulario-acciones">
+
+                    <button type="submit"
+                            class="gestion-boton">
+                        Registrar insumo
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section class="inventario-seccion"
+                 aria-labelledby="titulo-movimiento">
+
+            <div class="inventario-seccion-encabezado">
+
+                <div>
+
+                    <h3 id="titulo-movimiento">
+                        Registrar movimiento de inventario
+                    </h3>
+
+                    <p>
+                        Registra entradas de mercadería
+                        y consumo de ingredientes.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <form method="post"
+                  action="{% url 'registrar_movimiento_inventario' %}"
+                  class="inventario-formulario">
+
+                {% csrf_token %}
+
+                {% if formulario_movimiento.non_field_errors %}
+
+                    <div class="inventario-error"
+                         role="alert">
+                        {{ formulario_movimiento.non_field_errors }}
+                    </div>
+
+                {% endif %}
+
+                <div class="inventario-formulario-grid">
+
+                    {% for campo in formulario_movimiento %}
+
+                        <div class="inventario-campo">
+
+                            <label for="{{ campo.id_for_label }}">
+                                {{ campo.label }}
+                            </label>
+
+                            {{ campo }}
+
+                            {% if campo.errors %}
+
+                                <div class="inventario-error"
+                                     role="alert">
+                                    {{ campo.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+                <div class="inventario-formulario-acciones">
+
+                    <button type="submit"
+                            class="gestion-boton">
+                        Registrar movimiento
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section class="inventario-seccion"
+                 id="listado-insumos"
+                 aria-labelledby="titulo-listado-insumos">
+
+            <div class="inventario-seccion-encabezado">
+
+                <div>
+
+                    <h3 id="titulo-listado-insumos">
+                        Ingredientes y materiales
+                    </h3>
+
+                    <p>
+                        Consulta las existencias disponibles,
+                        sus niveles mínimos y administra
+                        los ingredientes activos e inactivos.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <form method="get"
+                  action="{% url 'inventario_operia' %}#listado-insumos"
+                  class="inventario-buscador">
+
+                <div class="inventario-buscador-campo">
+
+                    <label for="buscar-insumo">
+                        Buscar ingrediente
+                    </label>
+
+                    <input type="search"
+                           id="buscar-insumo"
+                           name="buscar"
+                           class="inventario-input"
+                           placeholder="Ej: Harina, queso, aceitunas..."
+                           value="{{ request.GET.buscar|default:'' }}">
+
+                </div>
+
+                <div class="inventario-buscador-campo">
+
+                    <label for="estado-insumo">
+                        Estado
+                    </label>
+
+                    <select id="estado-insumo"
+                            name="estado"
+                            class="inventario-input">
+
+                        <option value="todos"
+                            {% if request.GET.estado == "todos" or not request.GET.estado %}selected{% endif %}>
+                            Todos
+                        </option>
+
+                        <option value="activos"
+                            {% if request.GET.estado == "activos" %}selected{% endif %}>
+                            Activos
+                        </option>
+
+                        <option value="inactivos"
+                            {% if request.GET.estado == "inactivos" %}selected{% endif %}>
+                            Inactivos
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="inventario-buscador-acciones">
+
+                    <button type="submit"
+                            class="gestion-boton">
+                        Buscar
+                    </button>
+
+                    <a href="{% url 'inventario_operia' %}#listado-insumos"
+                       class="inventario-boton-limpiar">
+                        Limpiar
+                    </a>
+
+                </div>
+
+            </form>
+
+            {% if insumos %}
+
+                <div class="inventario-tabla-contenedor">
+
+                    <table class="inventario-tabla">
+
+                        <thead>
+
+                            <tr>
+                                <th scope="col">Insumo</th>
+                                <th scope="col">Unidad</th>
+                                <th scope="col">Stock actual</th>
+                                <th scope="col">Stock mínimo</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for insumo in insumos %}
+
+                                <tr>
+
+                                    <td>
+                                        <strong>
+                                            {{ insumo.nombre }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        {{ insumo.get_unidad_medida_display }}
+                                    </td>
+
+                                    <td>
+                                        {{ insumo.stock_actual|floatformat:3 }}
+                                    </td>
+
+                                    <td>
+                                        {{ insumo.stock_minimo|floatformat:3 }}
+                                    </td>
+
+                                    <td>
+
+                                        {% if not insumo.activo %}
+
+                                            <span class="inventario-estado inactivo">
+                                                Inactivo
+                                            </span>
+
+                                        {% elif insumo.stock_bajo %}
+
+                                            <span class="inventario-estado bajo">
+                                                Stock bajo
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="inventario-estado normal">
+                                                Disponible
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+
+                                        <div class="inventario-acciones">
+
+                                            <a href="{% url 'editar_insumo' insumo.id %}"
+                                               class="gestion-boton">
+                                                Editar
+                                            </a>
+
+                                            <form method="post"
+                                                  action="{% url 'cambiar_estado_insumo' insumo.id %}"
+                                                  class="inventario-accion-formulario">
+
+                                                {% csrf_token %}
+
+                                                {% if insumo.activo %}
+
+                                                    <button type="submit"
+                                                            class="inventario-boton-desactivar"
+                                                            onclick="return confirm('¿Deseas desactivar este insumo?');">
+                                                        Desactivar
+                                                    </button>
+
+                                                {% else %}
+
+                                                    <button type="submit"
+                                                            class="inventario-boton-reactivar"
+                                                            onclick="return confirm('¿Deseas reactivar este insumo?');">
+                                                        Reactivar
+                                                    </button>
+
+                                                {% endif %}
+
+                                            </form>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="estado-vacio">
+
+                    {% if request.GET.buscar or request.GET.estado == "activos" or request.GET.estado == "inactivos" %}
+
+                        No se encontraron ingredientes
+                        que coincidan con la búsqueda
+                        o los filtros seleccionados.
+
+                    {% else %}
+
+                        Todavía no hay insumos registrados.
+                        Utiliza el formulario anterior para
+                        agregar tu primer ingrediente o material.
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <section class="inventario-seccion"
+                 aria-labelledby="titulo-movimientos">
+
+            <div class="inventario-seccion-encabezado">
+
+                <div>
+
+                    <h3 id="titulo-movimientos">
+                        Últimos movimientos
+                    </h3>
+
+                    <p>
+                        Historial reciente de entradas
+                        y salidas de inventario.
+                    </p>
+
+                </div>
+
+            </div>
+
+            {% if movimientos %}
+
+                <div class="inventario-tabla-contenedor">
+
+                    <table class="inventario-tabla">
+
+                        <thead>
+
+                            <tr>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Insumo</th>
+                                <th scope="col">Movimiento</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col">Motivo</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for movimiento in movimientos %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ movimiento.fecha|date:"d/m/Y H:i" }}
+                                    </td>
+
+                                    <td>
+                                        {{ movimiento.insumo.nombre }}
+                                    </td>
+
+                                    <td>
+
+                                        {% if movimiento.tipo == "entrada" %}
+
+                                            <span class="inventario-estado normal">
+                                                Entrada
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="inventario-estado bajo">
+                                                Salida
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td>
+                                        {{ movimiento.cantidad|floatformat:3 }}
+                                        {{ movimiento.insumo.unidad_medida }}
+                                    </td>
+
+                                    <td>
+                                        {{ movimiento.motivo }}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="estado-vacio">
+
+                    Todavía no existen movimientos registrados.
+                    Las entradas y salidas de mercadería
+                    aparecerán aquí cuando sean registradas.
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <a href="{% url 'panel_operia' %}"
+           class="inventario-volver">
+            ← Volver al panel principal
+        </a>
+
+        <footer class="panel-pie">
+
+            <span>
+                Sistema de gestión de Masa Rica
+            </span>
+
+            <span>{% now "Y" %}</span>
+
+        </footer>
+
+    </main>
+
+</body>
+</html>

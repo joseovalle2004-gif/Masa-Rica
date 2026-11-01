@@ -1,0 +1,79 @@
+
+@import url("./login_cliente.css");
+
+.pagina-registro .acceso-contenido {
+    padding-top: 35px;
+    padding-bottom: 35px;
+}
+
+.pagina-registro .acceso-formulario {
+    width: 100%;
+}
+
+.pagina-registro .formulario-registro {
+    display: flex;
+    flex-direction: column;
+}
+
+.pagina-registro .grupo-campo {
+    margin-bottom: 18px;
+}
+
+.pagina-registro .grupo-campo small {
+    display: block;
+    margin-top: 7px;
+    color: #817b78;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.pagina-registro .grupo-campo .mensaje-error {
+    color: #b42332;
+}
+
+.pagina-registro .campo-control {
+    position: relative;
+}
+
+.pagina-registro .campo-control input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.pagina-registro .campo-control:has(.mostrar-password) input {
+    padding-right: 95px;
+}
+
+.pagina-registro .mostrar-password {
+    cursor: pointer;
+}
+
+.pagina-registro .boton-registro {
+    width: 100%;
+    cursor: pointer;
+}
+
+.pagina-registro .aviso-seguridad a {
+    color: #8c2424;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.pagina-registro .aviso-seguridad a:hover {
+    text-decoration: underline;
+}
+
+.pagina-registro .mensaje-error:empty {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .pagina-registro .acceso-contenido {
+        padding-top: 25px;
+        padding-bottom: 30px;
+    }
+
+    .pagina-registro .grupo-campo {
+        margin-bottom: 15px;
+    }
+}

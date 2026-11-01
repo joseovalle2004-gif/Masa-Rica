@@ -1,0 +1,281 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Editar insumo | Operia</title>
+
+    
+    <link rel="stylesheet"
+          href="{% static 'web/css/panel.css' %}?v=2">
+
+    
+    <link rel="stylesheet"
+          href="{% static 'web/css/inventario.css' %}?v=2">
+
+</head>
+
+<body>
+
+<div class="operia-layout">
+
+
+    <aside class="sidebar">
+
+        <div class="sidebar-marca">
+            <h1>Operia</h1>
+            <p>Gestión interna · Masa Rica</p>
+        </div>
+
+        <nav class="sidebar-menu"
+             aria-label="Menú principal">
+
+            <a href="{% url 'panel_operia' %}">
+                Panel principal
+            </a>
+
+            <a href="{% url 'pedidos_operia' %}">
+                Pedidos
+            </a>
+
+            <a href="{% url 'inventario_operia' %}"
+               class="activo"
+               aria-current="page">
+                Inventario
+            </a>
+
+            <a href="#ventas">
+                Ventas
+            </a>
+
+            <a href="#proveedores">
+                Proveedores
+            </a>
+
+            <a href="#reportes">
+                Reportes
+            </a>
+
+        </nav>
+
+        <div class="sidebar-inferior">
+
+            <p class="sidebar-usuario">
+                Usuario conectado:
+                {{ request.user.username }}
+            </p>
+
+            <form method="post"
+                  action="{% url 'logout_operia' %}">
+
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="btn-salir">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+
+
+    <main class="contenido-principal">
+
+        
+
+        <header class="encabezado-panel">
+
+            <p class="inventario-etiqueta">
+                CONTROL DE EXISTENCIAS
+            </p>
+
+            <h2>
+                Editar ingrediente o material
+            </h2>
+
+            <p>
+                Actualiza la información de
+                <strong>{{ insumo.nombre }}</strong>
+                sin modificar su historial de inventario.
+            </p>
+
+        </header>
+
+
+
+        <section class="inventario-seccion"
+                 aria-labelledby="titulo-editar-insumo">
+
+            <div class="inventario-seccion-encabezado">
+
+                <div>
+
+                    <h3 id="titulo-editar-insumo">
+                        Información del insumo
+                    </h3>
+
+                    <p>
+                        Modifica los datos necesarios
+                        y guarda los cambios.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form method="post"
+                  action="{% url 'editar_insumo' insumo.id %}"
+                  class="inventario-formulario">
+
+                {% csrf_token %}
+
+                
+
+                {% if formulario.non_field_errors %}
+
+                    <div class="inventario-error"
+                         role="alert">
+
+                        {{ formulario.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                
+
+                <div class="inventario-formulario-grid">
+
+                    {% for campo in formulario %}
+
+                        <div class="inventario-campo">
+
+                            <label for="{{ campo.id_for_label }}">
+                                {{ campo.label }}
+                            </label>
+
+                            {{ campo }}
+
+                            {% if campo.errors %}
+
+                                <div class="inventario-error"
+                                     role="alert">
+
+                                    {{ campo.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+
+                <div class="editar-insumo-acciones">
+
+                    <button type="submit"
+                            class="editar-insumo-guardar">
+
+                        Guardar cambios
+
+                    </button>
+
+                    <a href="{% url 'inventario_operia' %}"
+                       class="editar-insumo-cancelar">
+
+                        Volver al inventario
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+
+        <section class="inventario-seccion"
+                 aria-labelledby="titulo-control-stock">
+
+            <div class="inventario-seccion-encabezado">
+
+                <div>
+
+                    <h3 id="titulo-control-stock">
+                        Control de existencias
+                    </h3>
+
+                    <p>
+                        El stock actual se administra
+                        mediante entradas y salidas.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="inventario-resumen">
+
+                
+
+                <article class="tarjeta">
+
+                    <h3>
+                        Stock actual
+                    </h3>
+
+                    <p class="valor">
+
+                        {{ insumo.stock_actual|floatformat:3 }}
+                        {{ insumo.unidad_medida }}
+
+                    </p>
+
+                </article>
+
+
+                
+
+                <article class="tarjeta">
+
+                    <h3>
+                        Stock mínimo actual
+                    </h3>
+
+                    <p class="valor">
+
+                        {{ insumo.stock_minimo|floatformat:3 }}
+                        {{ insumo.unidad_medida }}
+
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>
