@@ -1,8 +1,0 @@
-
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="48" fill="#8f1f28"></circle>
-  <circle cx="50" cy="50" r="43" fill="none" stroke="#fff5e9" stroke-width="2"></circle>
-  <text x="50" y="25" text-anchor="middle" fill="#fff5e9" font-size="9" font-family="Georgia,serif">MASA RICA</text>
-  <text x="50" y="57" text-anchor="middle" fill="#fff5e9" font-size="32" font-weight="bold" font-family="Georgia,serif">MR</text>
-  <text x="50" y="77" text-anchor="middle" fill="#fff5e9" font-size="7" font-family="Georgia,serif">EMPANADAS</text>
-</svg>
