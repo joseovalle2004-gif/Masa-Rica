@@ -1,0 +1,350 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="Descubre los productos de Masa Rica, sus precios y preparaciones tradicionales."
+    >
+
+    <title>{{ titulo_categoria }} | Masa Rica</title>
+
+    
+    <link
+        rel="stylesheet"
+        href="{% static 'web/css/productos.css' %}?v=3"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'web/css/carrito.css' %}?v=3"
+    >
+
+    <style>
+        /* Garantiza que el carrito se oculte correctamente */
+        .carrito-fondo[hidden],
+        .carrito-panel[hidden],
+        .contador-carrito[hidden] {
+            display: none !important;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+    <header class="encabezado">
+
+        <div class="contenedor navegacion">
+
+            <a
+                href="{% url 'inicio' %}"
+                class="logo"
+                aria-label="Masa Rica - Inicio"
+            >
+                Masa <span>Rica</span>
+            </a>
+
+            <div class="navegacion-acciones">
+
+                <a
+                    href="{% url 'inicio' %}#productos"
+                    class="boton-volver"
+                >
+                    ← Volver a productos
+                </a>
+
+                <button
+                    type="button"
+                    class="boton-ver-carrito abrir-carrito"
+                    aria-haspopup="dialog"
+                    aria-controls="carrito-panel"
+                >
+                    🛒 Carrito
+                    <span class="contador-carrito" hidden>0</span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <main>
+
+        <section class="catalogo">
+
+            <div class="contenedor">
+
+                <div class="catalogo-encabezado">
+
+                    <p class="etiqueta">
+                        NUESTRO CATÁLOGO
+                    </p>
+
+                    <div
+                        class="catalogo-icono"
+                        aria-hidden="true"
+                    >
+                        {{ icono_categoria }}
+                    </div>
+
+                    <h1>
+                        {{ titulo_categoria }}
+                    </h1>
+
+                    <p class="catalogo-descripcion">
+                        {{ descripcion_categoria }}
+                    </p>
+
+                    {% if tipo_venta == "encargo" %}
+
+                        <span class="catalogo-tipo tipo-encargo">
+                            Preparaciones por encargo
+                        </span>
+
+                    {% else %}
+
+                        <span class="catalogo-tipo">
+                            Productos de venta habitual
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <div class="catalogo-grid">
+
+                    {% for producto in productos %}
+
+                        <article class="producto-tarjeta">
+
+                            
+
+                            <div
+                                class="producto-icono"
+                                aria-hidden="true"
+                            >
+                                {{ icono_categoria }}
+                            </div>
+
+
+                            
+
+                            <div class="producto-informacion">
+
+                                <h2>
+                                    {{ producto.nombre }}
+                                </h2>
+
+                                <p class="producto-disponibilidad">
+
+                                    <span class="indicador-disponible"></span>
+
+                                    Disponible
+
+                                </p>
+
+                                <div class="producto-precio">
+
+                                    <span class="precio-etiqueta">
+                                        Precio
+                                    </span>
+
+                                    <strong>
+                                        ${{ producto.precio }}
+                                    </strong>
+
+                                    <span class="precio-moneda">
+                                        CLP
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            
+
+                            <div class="producto-compra">
+
+                                <label for="cantidad-{{ producto.id }}">
+                                    Cantidad
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="cantidad-{{ producto.id }}"
+                                    name="cantidad"
+                                    min="1"
+                                    max="1000"
+                                    step="1"
+                                    value="1"
+                                    inputmode="numeric"
+                                >
+
+                                <button
+                                    type="button"
+                                    class="boton-agregar"
+                                    data-producto-id="{{ producto.id }}"
+                                    data-producto-nombre="{{ producto.nombre }}"
+                                    data-producto-precio="{{ producto.precio }}"
+                                    data-producto-tipo="{{ producto.tipo_venta }}"
+                                    data-cantidad-id="cantidad-{{ producto.id }}"
+                                >
+                                    🛒 Agregar al carrito
+                                </button>
+
+                            </div>
+
+                        </article>
+
+                    {% empty %}
+
+                        
+
+                        <div class="catalogo-vacio">
+
+                            <div
+                                class="catalogo-vacio-icono"
+                                aria-hidden="true"
+                            >
+                                🛍️
+                            </div>
+
+                            <h2>
+                                Todavía no hay productos disponibles
+                            </h2>
+
+                            <p>
+                                Actualmente no tenemos productos
+                                registrados para esta categoría.
+
+                                Pronto encontrarás aquí nuestras
+                                preparaciones y sus precios.
+                            </p>
+
+                            <a
+                                href="{% url 'inicio' %}#productos"
+                                class="boton-volver-catalogo"
+                            >
+                                ← Volver al catálogo
+                            </a>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <footer class="pie-pagina">
+
+        <div class="contenedor">
+
+            <p>
+                &copy; {% now "Y" %} Masa Rica.
+                Todos los derechos reservados.
+            </p>
+
+            <span>
+                Tradición familiar · Viña del Mar
+            </span>
+
+        </div>
+
+    </footer>
+
+
+
+    <div
+        class="carrito-fondo"
+        id="carrito-fondo"
+        hidden
+    ></div>
+
+    <section
+        class="carrito-panel"
+        id="carrito-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="carrito-titulo"
+        tabindex="-1"
+        hidden
+    >
+
+        <div class="carrito-encabezado">
+
+            <h2 id="carrito-titulo">
+                🛒 Mi carrito
+            </h2>
+
+            <button
+                type="button"
+                class="carrito-cerrar"
+                id="cerrar-carrito"
+                aria-label="Cerrar carrito"
+            >
+                &times;
+            </button>
+
+        </div>
+
+        <div class="carrito-contenido">
+
+            <div class="carrito-vacio">
+
+                <span
+                    class="carrito-vacio-icono"
+                    aria-hidden="true"
+                >
+                    🛍️
+                </span>
+
+                <h3>Tu carrito está vacío</h3>
+
+                <p>
+                    Explora nuestras preparaciones
+                    y encuentra tus favoritas.
+                </p>
+
+                <a
+                    href="{% url 'inicio' %}#productos"
+                    class="carrito-ver-productos"
+                    id="carrito-ver-productos"
+                >
+                    Ver productos
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <script
+        src="{% static 'web/js/carrito.js' %}?v=3"
+        defer
+    ></script>
+
+</body>
+</html>

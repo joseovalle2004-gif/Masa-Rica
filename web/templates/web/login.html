@@ -1,0 +1,258 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Acceso del personal autorizado al sistema de gestión Operia de Masa Rica.">
+
+    <meta name="theme-color" content="#651c27">
+
+    <title>Acceso del personal | Operia - Masa Rica</title>
+
+    <link rel="stylesheet"
+          href="{% static 'web/css/login.css' %}?v=3">
+</head>
+
+<body>
+
+<div class="pagina-login">
+
+    <aside class="panel-identidad">
+
+        <div class="identidad-superior">
+            <a href="{% url 'inicio' %}" class="marca">
+                Masa <span>Rica</span>
+            </a>
+
+            <span class="marca-separador"></span>
+            <span class="marca-sistema">OPERIA</span>
+        </div>
+
+        <div class="identidad-contenido">
+
+            <div class="identidad-simbolo" aria-hidden="true">
+                MR
+            </div>
+
+            <p class="identidad-etiqueta">
+                SISTEMA DE GESTIÓN INTERNA
+            </p>
+
+            <h1>
+                La tradición de siempre.
+                <em>Una gestión más simple.</em>
+            </h1>
+
+            <p class="identidad-descripcion">
+                Un espacio de trabajo diseñado para organizar
+                y acompañar las operaciones diarias de Masa Rica.
+            </p>
+
+            <div class="identidad-linea"></div>
+
+            <div class="identidad-detalle">
+                <span class="detalle-punto"></span>
+                Acceso exclusivo para personal autorizado
+            </div>
+
+        </div>
+
+        <div class="identidad-inferior">
+            <span>Masa Rica · Viña del Mar</span>
+            <span>Gestión interna</span>
+        </div>
+
+    </aside>
+
+    <main class="panel-acceso">
+
+        <div class="acceso-superior">
+            <a href="{% url 'inicio' %}" class="volver-inicio">
+                <span aria-hidden="true">←</span>
+                Volver al inicio
+            </a>
+        </div>
+
+        <div class="acceso-contenido">
+
+            <section class="acceso-formulario"
+                     aria-labelledby="titulo-login">
+
+                <div class="acceso-distintivo">
+                    <span class="distintivo-linea"></span>
+                    ACCESO DEL PERSONAL
+                </div>
+
+                <div class="acceso-encabezado">
+                    <h2 id="titulo-login">
+                        Bienvenido a Operia
+                    </h2>
+
+                    <p>
+                        Ingresa tus credenciales para continuar
+                        con tu sesión de trabajo.
+                    </p>
+                </div>
+
+                {% if messages %}
+
+                    <div class="mensajes"
+                         role="status"
+                         aria-live="polite">
+
+                        {% for message in messages %}
+                            <div class="mensaje {{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+                <form method="post"
+                      action="{% url 'login_operia' %}"
+                      class="formulario-login">
+
+                    {% csrf_token %}
+
+                    <div class="campo">
+
+                        <label for="username">
+                            Nombre de usuario
+                        </label>
+
+                        <div class="campo-control">
+
+                            <span class="campo-icono" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.8"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+
+                                    <circle cx="12" cy="8" r="4"></circle>
+                                    <path d="M4 21v-2a8 8 0 0 1 16 0v2"></path>
+                                </svg>
+                            </span>
+
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                placeholder="Ingresa tu usuario"
+                                autocomplete="username"
+                                maxlength="150"
+                                spellcheck="false"
+                                required
+                                autofocus
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="campo">
+
+                        <label for="password">
+                            Contraseña
+                        </label>
+
+                        <div class="campo-control">
+
+                            <span class="campo-icono" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.8"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+
+                                    <rect x="4" y="10"
+                                          width="16" height="11" rx="2"></rect>
+
+                                    <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                                </svg>
+                            </span>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Ingresa tu contraseña"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="mostrar-password"
+                                id="mostrar-password"
+                                aria-label="Mostrar contraseña"
+                                aria-pressed="false">
+                                Mostrar
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="boton-ingresar">
+                        <span>Iniciar sesión</span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+
+                </form>
+
+                <div class="aviso-seguridad">
+
+                    <span class="seguridad-icono" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.7"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            <path d="m9 12 2 2 4-4"></path>
+                        </svg>
+                    </span>
+
+                    <p>
+                        Este acceso está reservado al personal
+                        autorizado de Masa Rica. Utiliza únicamente
+                        tus credenciales asignadas.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <footer class="acceso-inferior">
+
+            <p>
+                &copy; {% now "Y" %} Masa Rica.
+                Todos los derechos reservados.
+            </p>
+
+            <span>Operia · Sistema de gestión</span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+<script src="{% static 'web/js/login.js' %}?v=1" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,618 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#78221e">
+    <meta name="description" content="Seguimiento de ventas e ingresos de Masa Rica mediante Operia.">
+
+    <title>Gestión de ventas | Masa Rica</title>
+
+    <link rel="stylesheet"
+          href="{% static 'web/css/ventas.css' %}?v=3">
+
+    <script src="{% static 'web/js/ventas.js' %}?v=1"
+            defer></script>
+    <script src="{% static 'web/js/ventas_auto.js' %}?v=1"
+        defer></script>
+</head>
+
+<body>
+
+    <header class="barra-superior">
+
+        <a href="{% url 'panel_operia' %}"
+           class="marca"
+           aria-label="Operia, ir al panel principal">
+
+            <strong>Masa Rica</strong>
+
+        </a>
+
+        <nav class="barra-navegacion"
+             aria-label="Navegación principal">
+
+            <a href="{% url 'panel_operia' %}">
+                Panel principal
+            </a>
+
+            <form method="post"
+                  action="{% url 'logout_operia' %}">
+
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="boton-salir">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </nav>
+
+    </header>
+
+    <main class="ventas-contenido"
+      id="ventas-contenido">
+
+        <header class="titulo-pagina">
+
+            <div>
+
+                <p class="etiqueta">
+                    CONTROL COMERCIAL
+                </p>
+
+                <h1>Gestión de ventas</h1>
+
+                <p class="descripcion">
+                    Supervisa los ingresos, consulta los medios
+                    de pago y revisa las ventas registradas
+                    en Masa Rica.
+                </p>
+
+            </div>
+
+            <div class="fecha-actual">
+                {% now "d/m/Y" %}
+            </div>
+
+        </header>
+
+        {% if messages %}
+
+            <section class="mensajes"
+                     aria-label="Notificaciones del sistema"
+                     aria-live="polite">
+
+                {% for message in messages %}
+
+                    <p role="status">
+                        {{ message }}
+                    </p>
+
+                {% endfor %}
+
+            </section>
+
+        {% endif %}
+
+        <section class="panel-filtros"
+                 aria-labelledby="titulo-filtros">
+
+            <div class="seccion-titulo">
+
+                <div>
+
+                    <h2 id="titulo-filtros">
+                        Consultar ventas
+                    </h2>
+
+                    <p>
+                        Selecciona un período, medio de pago
+                        o número de pedido para consultar
+                        los movimientos comerciales.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <form method="get"
+                  action="{% url 'ventas_operia' %}"
+                  class="filtros-formulario"
+                  id="filtros-ventas"
+                  role="search">
+
+                <div class="campo">
+
+                    <label for="fecha-desde">
+                        Fecha desde
+                    </label>
+
+                    <input type="date"
+                           id="fecha-desde"
+                           name="desde"
+                           value="{{ fecha_inicio }}"
+                           required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="fecha-hasta">
+                        Fecha hasta
+                    </label>
+
+                    <input type="date"
+                           id="fecha-hasta"
+                           name="hasta"
+                           value="{{ fecha_fin }}"
+                           required>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="metodo">
+                        Medio de pago
+                    </label>
+
+                    <select id="metodo" name="metodo">
+
+                        <option value="todos"
+                            {% if metodo_seleccionado == "todos" %}selected{% endif %}>
+                            Todos los medios
+                        </option>
+
+                        <option value="efectivo"
+                            {% if metodo_seleccionado == "efectivo" %}selected{% endif %}>
+                            Efectivo
+                        </option>
+
+                        <option value="debito"
+                            {% if metodo_seleccionado == "debito" %}selected{% endif %}>
+                            Débito
+                        </option>
+
+                        <option value="credito"
+                            {% if metodo_seleccionado == "credito" %}selected{% endif %}>
+                            Crédito
+                        </option>
+
+                        <option value="transferencia"
+                            {% if metodo_seleccionado == "transferencia" %}selected{% endif %}>
+                            Transferencia
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="campo">
+
+                    <label for="buscar">
+                        Número de pedido
+                    </label>
+
+                    <input type="search"
+                           id="buscar"
+                           name="buscar"
+                           value="{{ buscar }}"
+                           placeholder="Ej: 125">
+
+                </div>
+
+                <div class="filtros-acciones">
+
+                    <button type="submit"
+                            class="boton-principal">
+                        Aplicar filtros
+                    </button>
+
+                    <a href="{% url 'ventas_operia' %}"
+                       class="boton-secundario">
+                        Restablecer
+                    </a>
+
+                </div>
+
+            </form>
+
+            <div class="accesos-periodo"
+                 aria-label="Períodos rápidos">
+
+                <button type="button"
+                        data-periodo="hoy">
+                    Hoy
+                </button>
+
+                <button type="button"
+                        data-periodo="7">
+                    Últimos 7 días
+                </button>
+
+                <button type="button"
+                        data-periodo="30">
+                    Últimos 30 días
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="indicadores"
+                 aria-label="Indicadores comerciales">
+
+            <article class="indicador">
+
+                <span class="indicador-etiqueta">
+                    Ingresos del período
+                </span>
+
+                <strong class="indicador-valor">
+                    ${{ ingresos_periodo|intcomma }}
+                </strong>
+
+                <span class="indicador-nota">
+                    Pedidos entregados con pago confirmado
+                </span>
+
+            </article>
+
+            <article class="indicador">
+
+                <span class="indicador-etiqueta">
+                    Ingresos de hoy
+                </span>
+
+                <strong class="indicador-valor">
+                    ${{ ingresos_hoy|intcomma }}
+                </strong>
+
+                <span class="indicador-nota">
+                    Pedidos registrados hoy y contabilizados
+                </span>
+
+            </article>
+
+            <article class="indicador">
+
+                <span class="indicador-etiqueta">
+                    Ventas del período
+                </span>
+
+                <strong class="indicador-valor">
+                    {{ cantidad_ventas }}
+                </strong>
+
+                <span class="indicador-nota">
+                    Total de pedidos contabilizados
+                </span>
+
+            </article>
+
+            <article class="indicador">
+
+                <span class="indicador-etiqueta">
+                    Ticket promedio
+                </span>
+
+                <strong class="indicador-valor">
+                    ${{ ticket_promedio|intcomma }}
+                </strong>
+
+                <span class="indicador-nota">
+                    Valor promedio por venta
+                </span>
+
+            </article>
+
+        </section>
+
+        <section class="analisis-grid"
+                 aria-label="Análisis de ventas">
+
+            <article class="panel panel-grafico"
+                     aria-labelledby="titulo-grafico">
+
+                <div class="seccion-titulo">
+
+                    <div>
+
+                        <h2 id="titulo-grafico">
+                            Evolución de ingresos
+                        </h2>
+
+                        <p>
+                            Comparación diaria de ingresos
+                            durante los últimos 14 días
+                            del período seleccionado, como máximo.
+                        </p>
+
+                    </div>
+
+                    <span class="indicador-discreto">
+                        CLP
+                    </span>
+
+                </div>
+
+                <div id="grafico-ventas"
+                     class="grafico-ventas"
+                     role="img"
+                     aria-label="Gráfico de ingresos diarios">
+                </div>
+
+                {{ datos_grafico|json_script:"datos-grafico-ventas" }}
+
+            </article>
+
+            <article class="panel panel-medios"
+                     aria-labelledby="titulo-medios">
+
+                <div class="seccion-titulo">
+
+                    <div>
+
+                        <h2 id="titulo-medios">
+                            Medios de pago
+                        </h2>
+
+                        <p>
+                            Distribución de ingresos
+                            según la forma de pago utilizada.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="medios-lista">
+
+                    {% for medio in metodos_pago %}
+
+                        <div class="medio-item">
+
+                            <div class="medio-informacion">
+
+                                <span>
+                                    {{ medio.nombre }}
+                                </span>
+
+                                <strong>
+                                    ${{ medio.total|intcomma }}
+                                </strong>
+
+                            </div>
+
+                            <div class="medio-barra"
+                                 role="progressbar"
+                                 aria-label="{{ medio.nombre }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-valuenow="{{ medio.porcentaje|floatformat:0 }}">
+
+                                <div class="medio-progreso"
+                                     style="width: {{ medio.porcentaje|stringformat:'.1f' }}%;">
+                                </div>
+
+                            </div>
+
+                            <span class="medio-porcentaje">
+                                {{ medio.porcentaje|floatformat:1 }}%
+                            </span>
+
+                        </div>
+
+                    {% empty %}
+
+                        <p class="descripcion">
+                            No hay información de medios de pago
+                            para el período seleccionado.
+                        </p>
+
+                    {% endfor %}
+
+                </div>
+
+                <div class="medios-pie">
+
+                    <span>
+                        Unidades vendidas
+                    </span>
+
+                    <strong>
+                        {{ unidades_vendidas }}
+                    </strong>
+
+                </div>
+
+            </article>
+
+        </section>
+
+        <section class="panel historial"
+                 aria-labelledby="titulo-historial">
+
+            <div class="seccion-titulo historial-encabezado">
+
+                <div>
+
+                    <h2 id="titulo-historial">
+                        Historial de ventas
+                    </h2>
+
+                    <p>
+                        Registro de pedidos entregados
+                        con pago confirmado, según
+                        los filtros seleccionados.
+                    </p>
+
+                </div>
+
+                <span class="contador-registros">
+                    {{ cantidad_ventas }} ventas
+                </span>
+
+            </div>
+
+            {% if pedidos_pagina %}
+
+                <div class="tabla-contenedor"
+                     role="region"
+                     aria-label="Historial de ventas"
+                     tabindex="0">
+
+                    <table class="tabla-ventas">
+
+                        <thead>
+
+                            <tr>
+                                <th scope="col">Pedido</th>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Cliente</th>
+                                <th scope="col">Origen</th>
+                                <th scope="col">Medio de pago</th>
+                                <th scope="col">Total</th>
+                                <th scope="col">Detalle</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for pedido in pedidos_pagina %}
+
+                                <tr>
+
+                                    <td class="numero-pedido">
+                                        #{{ pedido.id }}
+                                    </td>
+
+                                    <td>
+                                        {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}
+                                    </td>
+
+                                    <td>
+                                        {{ pedido.nombre_cliente|default:"Sin nombre" }}
+                                    </td>
+
+                                    <td>
+                                        {{ pedido.get_origen_display }}
+                                    </td>
+
+                                    <td>
+
+                                        <span class="medio-etiqueta">
+                                            {{ pedido.get_metodo_pago_display }}
+                                        </span>
+
+                                    </td>
+
+                                    <td class="monto-tabla">
+                                        ${{ pedido.total_venta|intcomma }}
+                                    </td>
+
+                                    <td>
+
+                                        <a href="{% url 'detalle_pedido' pedido.id %}"
+                                           class="enlace-detalle"
+                                           aria-label="Ver detalle del pedido {{ pedido.id }}">
+                                            Ver pedido
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% if pagina.has_other_pages %}
+
+                    <nav class="paginacion"
+                         aria-label="Paginación del historial">
+
+                        <span>
+                            Página {{ pagina.number }}
+                            de {{ pagina.paginator.num_pages }}
+                        </span>
+
+                        <div class="paginacion-acciones">
+
+                            {% if pagina.has_previous %}
+
+                                <a href="?desde={{ fecha_inicio }}&amp;hasta={{ fecha_fin }}&amp;metodo={{ metodo_seleccionado }}&amp;buscar={{ buscar|urlencode }}&amp;pagina={{ pagina.previous_page_number }}#titulo-historial">
+                                    Anterior
+                                </a>
+
+                            {% endif %}
+
+                            {% if pagina.has_next %}
+
+                                <a href="?desde={{ fecha_inicio }}&amp;hasta={{ fecha_fin }}&amp;metodo={{ metodo_seleccionado }}&amp;buscar={{ buscar|urlencode }}&amp;pagina={{ pagina.next_page_number }}#titulo-historial">
+                                    Siguiente
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </nav>
+
+                {% endif %}
+
+            {% else %}
+
+                <div class="historial-vacio">
+
+                    <h3>No hay ventas para mostrar</h3>
+
+                    <p>
+                        No se encontraron pedidos entregados
+                        y pagados con los criterios seleccionados.
+                        Puedes modificar los filtros para consultar
+                        otro período.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <div class="volver-contenedor">
+
+            <a href="{% url 'panel_operia' %}"
+               class="enlace-volver">
+                ← Volver al panel principal
+            </a>
+
+        </div>
+
+        <footer class="pie-pagina">
+
+            <span>
+                Sistema de gestión de Masa Rica
+            </span>
+
+            <span>
+                © {% now "Y" %} Masa Rica
+            </span>
+
+        </footer>
+
+    </main>
+
+</body>
+</html>

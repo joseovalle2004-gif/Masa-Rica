@@ -1,0 +1,381 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Registrar pedido | Operia</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'web/css/crear_pedido.css' %}?v=3"
+    >
+
+    <script
+        src="{% static 'web/js/crear_pedido.js' %}?v=3"
+        defer
+    ></script>
+</head>
+
+<body>
+
+    
+    <header class="encabezado">
+
+        <div class="contenedor encabezado-contenido">
+
+            <a href="{% url 'panel_operia' %}" class="logo">
+                Operia <span>Masa Rica</span>
+            </a>
+
+            <nav class="navegacion">
+
+                <a href="{% url 'panel_operia' %}">
+                    Panel principal
+                </a>
+
+                <a href="{% url 'pedidos_operia' %}">
+                    Pedidos
+                </a>
+
+                <form
+                    method="post"
+                    action="{% url 'logout_operia' %}"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit" class="boton-salir">
+                        Cerrar sesión
+                    </button>
+                </form>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    
+    <main class="contenedor principal">
+
+        <section class="titulo-seccion">
+
+            <p class="etiqueta">
+                GESTIÓN DE PEDIDOS
+            </p>
+
+            <h1>Registrar pedido telefónico</h1>
+
+            <p>
+                Ingresa los datos del cliente y los productos
+                solicitados para registrar un nuevo pedido.
+            </p>
+
+        </section>
+
+        
+        {% if messages %}
+
+            <div class="mensajes" role="alert">
+
+                {% for message in messages %}
+
+                    <p class="mensaje {{ message.tags }}">
+                        {{ message }}
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+        
+        <form
+            method="post"
+            class="formulario-pedido"
+            id="formulario-pedido"
+        >
+
+            {% csrf_token %}
+
+            
+            <section class="bloque-formulario">
+
+                <h2>1. Datos del cliente</h2>
+
+                <div class="campos-grid">
+
+                    
+                    <div class="campo">
+
+                        <label for="nombre_cliente">
+                            Nombre del cliente *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nombre_cliente"
+                            name="nombre_cliente"
+                            minlength="2"
+                            maxlength="100"
+                            value="{{ datos.nombre_cliente|default:'' }}"
+                            placeholder="Ej.: María González"
+                            autocomplete="name"
+                            aria-describedby="ayuda-nombre error-nombre"
+                            required
+                        >
+
+                        <small
+                            class="ayuda"
+                            id="ayuda-nombre"
+                        >
+                            Ingresa el nombre del cliente sin números.
+                        </small>
+
+                        <small
+                            class="mensaje-error"
+                            id="error-nombre"
+                            aria-live="polite"
+                        ></small>
+
+                    </div>
+
+                    
+                    <div class="campo">
+
+                        <label for="telefono_cliente">
+                            Teléfono de contacto
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="telefono_cliente"
+                            name="telefono_cliente"
+                            maxlength="20"
+                            value="{{ datos.telefono_cliente|default:'' }}"
+                            placeholder="Ej.: +56 9 1234 5678"
+                            autocomplete="tel"
+                            aria-describedby="ayuda-telefono error-telefono"
+                        >
+
+                        <small
+                            class="ayuda"
+                            id="ayuda-telefono"
+                        >
+                            Opcional. Ingresa un teléfono chileno válido.
+                        </small>
+
+                        <small
+                            class="mensaje-error"
+                            id="error-telefono"
+                            aria-live="polite"
+                        ></small>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            
+            <section class="bloque-formulario">
+
+                <h2>2. Productos del pedido</h2>
+
+                <p class="ayuda">
+                    Indica la cantidad de cada producto.
+                    Deja en cero los productos que el cliente
+                    no solicitó.
+                </p>
+
+                {% if productos %}
+
+                    <div class="productos-lista">
+
+                        {% for producto in productos %}
+
+                            <article class="producto-fila">
+
+                                <div class="producto-informacion">
+
+                                    <h3>
+                                        {{ producto.nombre }}
+                                    </h3>
+
+                                    <p>
+                                        {{ producto.get_categoria_display }}
+                                    </p>
+
+                                    {% if producto.tipo_venta == 'encargo' %}
+
+                                        <span class="etiqueta-encargo">
+                                            Por encargo
+                                        </span>
+
+                                    {% endif %}
+
+                                    <span class="producto-precio">
+                                        Precio unitario:
+                                        ${{ producto.precio }}
+                                    </span>
+
+                                </div>
+
+                                
+                                <div class="campo-cantidad">
+
+                                    <label for="producto_{{ producto.id }}">
+                                        Cantidad
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        id="producto_{{ producto.id }}"
+                                        name="producto_{{ producto.id }}"
+                                        class="cantidad-producto"
+                                        min="0"
+                                        max="1000"
+                                        step="1"
+                                        value="{{ producto.cantidad_ingresada|default_if_none:'0' }}"
+                                        data-precio="{{ producto.precio }}"
+                                        data-producto-id="{{ producto.id }}"
+                                        inputmode="numeric"
+                                        aria-label="Cantidad de {{ producto.nombre }}"
+                                    >
+
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                    
+                    <p
+                        class="mensaje-error"
+                        id="error-productos"
+                        role="alert"
+                    ></p>
+
+                {% else %}
+
+                    <div class="aviso-vacio">
+
+                        <p>
+                            No hay productos disponibles
+                            para seleccionar.
+                        </p>
+
+                        <p>
+                            Revisa el catálogo de productos
+                            en Django Admin.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+                
+                <div
+                    class="resumen-total"
+                    aria-live="polite"
+                >
+
+                    <span>
+                        Total estimado del pedido
+                    </span>
+
+                    <strong
+                        id="total-pedido"
+                        data-total="0"
+                    >
+                        $0
+                    </strong>
+
+                </div>
+
+                <p class="ayuda">
+                    El total se calcula utilizando los precios
+                    y cantidades seleccionadas.
+                    Django verificará los datos antes de
+                    guardar el pedido.
+                </p>
+
+            </section>
+
+            
+            <section class="bloque-formulario">
+
+                <h2>3. Observaciones</h2>
+
+                <div class="campo">
+
+                    <label for="observaciones">
+                        Indicaciones especiales (opcional)
+                    </label>
+
+                    <textarea
+                        id="observaciones"
+                        name="observaciones"
+                        rows="4"
+                        maxlength="1000"
+                        placeholder="Ej.: indicaciones especiales de preparación..."
+                        aria-describedby="ayuda-observaciones error-observaciones"
+                    >{{ datos.observaciones|default:'' }}</textarea>
+
+                    <small
+                        class="ayuda"
+                        id="ayuda-observaciones"
+                    >
+                        Máximo 1000 caracteres.
+                    </small>
+
+                    <small
+                        class="mensaje-error"
+                        id="error-observaciones"
+                        aria-live="polite"
+                    ></small>
+
+                </div>
+
+            </section>
+
+            
+            <p
+                class="mensaje-error"
+                id="error-formulario"
+                role="alert"
+            ></p>
+
+            
+            <div class="acciones-formulario">
+
+                <a
+                    href="{% url 'pedidos_operia' %}"
+                    class="boton-secundario"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="boton-principal"
+                    id="boton-guardar-pedido"
+                    {% if not productos %}disabled{% endif %}
+                >
+                    Guardar pedido
+                </button>
+
+            </div>
+
+        </form>
+
+    </main>
+
+</body>
+</html>

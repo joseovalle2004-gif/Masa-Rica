@@ -1,0 +1,666 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#78221e">
+
+    <title>Pedido #{{ pedido.id }} | Operia</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'web/css/detalle_pedido.css' %}?v=5"
+    >
+</head>
+
+<body>
+
+    <header class="encabezado">
+        <div class="contenedor encabezado-contenido">
+
+            <a href="{% url 'panel_operia' %}" class="logo">
+                Operia <span>Masa Rica</span>
+            </a>
+
+            <nav class="navegacion" aria-label="Navegación principal">
+
+                <a href="{% url 'panel_operia' %}">
+                    Panel principal
+                </a>
+
+                <a
+                    href="{% url 'pedidos_operia' %}"
+                    class="activo"
+                    aria-current="page"
+                >
+                    Pedidos
+                </a>
+
+                <form
+                    method="post"
+                    action="{% url 'logout_operia' %}"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit" class="boton-salir">
+                        Cerrar sesión
+                    </button>
+                </form>
+
+            </nav>
+        </div>
+    </header>
+
+    <main class="contenedor principal">
+
+        <a href="{% url 'pedidos_operia' %}" class="volver">
+            ← Volver a pedidos
+        </a>
+
+        <section class="cabecera-detalle">
+
+            <div>
+                <p class="etiqueta">GESTIÓN DE PEDIDOS</p>
+
+                <h1>Detalle del pedido #{{ pedido.id }}</h1>
+
+                <p>
+                    Consulta la información y controla
+                    la preparación de este pedido.
+                </p>
+            </div>
+
+            <span class="estado estado-{{ pedido.estado }}">
+                {{ pedido.get_estado_display }}
+            </span>
+
+        </section>
+
+        {% if messages %}
+            <div class="mensajes-sistema" aria-live="polite">
+
+                {% for message in messages %}
+                    <p class="mensaje-pago" role="status">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+
+            </div>
+        {% endif %}
+
+        <section class="tarjeta progreso-tarjeta">
+
+            <div class="progreso-encabezado">
+                <div>
+                    <p class="progreso-subtitulo">
+                        CONTROL DE PREPARACIÓN
+                    </p>
+
+                    <h2>Estado del pedido</h2>
+                </div>
+            </div>
+
+            {% if pedido.estado == 'cancelado' %}
+
+                <p class="progreso-cancelado" role="status">
+                    Este pedido fue cancelado.
+                    Su preparación ya no continuará.
+                </p>
+
+            {% else %}
+
+                <div class="progreso-etapas">
+
+                    {% for etapa in pedido.etapas_visuales %}
+
+                        {% if etapa.valor == pedido.siguiente_estado %}
+
+                            <form
+                                method="post"
+                                action="{% url 'actualizar_estado_pedido' pedido.id %}"
+                                class="formulario-etapa"
+                            >
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="origen"
+                                    value="detalle"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="estado"
+                                    value="{{ etapa.valor }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="progreso-etapa siguiente"
+                                >
+                                    <span class="etapa-circulo">
+                                        {{ etapa.numero }}
+                                    </span>
+
+                                    <span class="etapa-nombre">
+                                        {{ etapa.etiqueta }}
+                                    </span>
+
+                                    <span class="etapa-accion">
+                                        Presionar para avanzar
+                                    </span>
+                                </button>
+
+                                {% if etapa.valor == 'entregado' %}
+
+                                    <label
+                                        for="numero-confirmacion-{{ pedido.id }}"
+                                        class="etapa-confirmacion-label"
+                                    >
+                                        Número del pedido
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="numero-confirmacion-{{ pedido.id }}"
+                                        name="numero_confirmacion"
+                                        inputmode="numeric"
+                                        pattern="[0-9]+"
+                                        placeholder="Ej. {{ pedido.id }}"
+                                        autocomplete="off"
+                                        required
+                                    >
+
+                                {% endif %}
+
+                            </form>
+
+                        {% else %}
+
+                            <div
+                                class="progreso-etapa {{ etapa.clase_visual }}"
+                                {% if etapa.es_actual %}
+                                    aria-current="step"
+                                {% endif %}
+                            >
+                                <span class="etapa-circulo">
+                                    {{ etapa.numero }}
+                                </span>
+
+                                <span class="etapa-nombre">
+                                    {{ etapa.etiqueta }}
+                                </span>
+
+                                {% if etapa.es_actual %}
+                                    <span class="etapa-accion">
+                                        Etapa actual
+                                    </span>
+
+                                {% elif etapa.esta_completada %}
+                                    <span class="etapa-accion">
+                                        Completada
+                                    </span>
+
+                                {% else %}
+                                    <span class="etapa-accion">
+                                        Pendiente
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                        {% endif %}
+
+                    {% empty %}
+
+                        <p class="progreso-ayuda">
+                            No hay etapas disponibles para este pedido.
+                        </p>
+
+                    {% endfor %}
+
+                </div>
+
+                {% if pedido.estado == 'entregado' %}
+
+                    <p class="progreso-ayuda">
+                        El pedido fue retirado por el cliente.
+                        No quedan etapas pendientes.
+                    </p>
+
+                {% else %}
+
+                    <p class="progreso-ayuda">
+                        Selecciona la siguiente etapa para actualizar
+                        el estado del pedido.
+                    </p>
+
+                {% endif %}
+
+            {% endif %}
+
+        </section>
+
+        <div class="cuadricula">
+
+            <section class="tarjeta">
+
+                <h2>Información del cliente</h2>
+
+                <div class="campo">
+                    <span>Nombre del cliente</span>
+                    <strong>{{ pedido.nombre_cliente }}</strong>
+                </div>
+
+                <div class="campo">
+                    <span>Teléfono</span>
+                    <strong>
+                        {{ pedido.telefono_cliente|default:"No indicado" }}
+                    </strong>
+                </div>
+
+                <div class="campo">
+                    <span>Origen del pedido</span>
+                    <strong>{{ pedido.get_origen_display }}</strong>
+                </div>
+
+                <div class="campo">
+                    <span>Fecha y hora</span>
+                    <strong>
+                        {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}
+                    </strong>
+                </div>
+
+                <div class="campo">
+                    <span>Tiempo estimado de preparación</span>
+                    <strong>
+                        {{ pedido.minutos_estimados }} minutos
+                    </strong>
+                </div>
+
+            </section>
+
+            <section class="tarjeta">
+
+                <h2>Observaciones del pedido</h2>
+
+                {% if pedido.observaciones %}
+
+                    <p class="observaciones">
+                        {{ pedido.observaciones|linebreaksbr }}
+                    </p>
+
+                {% else %}
+
+                    <p class="sin-observaciones">
+                        Este pedido no tiene observaciones especiales.
+                    </p>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+        <section class="tarjeta productos-tarjeta">
+
+            <h2>Productos solicitados</h2>
+
+            <div class="tabla-desplazable">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Precio unitario</th>
+                            <th scope="col">Subtotal</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for detalle in detalles %}
+
+                            <tr>
+                                <td>{{ detalle.producto.nombre }}</td>
+                                <td>{{ detalle.cantidad }}</td>
+                                <td>${{ detalle.precio_unitario }}</td>
+
+                                <td class="subtotal">
+                                    ${{ detalle.subtotal }}
+                                </td>
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+                                <td colspan="4">
+                                    No hay productos asociados a este pedido.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="total-contenedor">
+
+                <span>Total del pedido</span>
+
+                <strong>${{ total_pedido }}</strong>
+
+            </div>
+
+        </section>
+
+        <section class="tarjeta informacion-pago">
+
+            <h2>Información del pago</h2>
+
+            <div class="campo">
+                <span>Método de pago</span>
+
+                <strong>
+                    {{ pedido.get_metodo_pago_display }}
+                </strong>
+            </div>
+
+            <div class="campo">
+                <span>Estado del pago</span>
+
+                <strong>
+                    {{ pedido.get_estado_pago_display }}
+                </strong>
+            </div>
+
+            <div class="campo">
+                <span>Total del pedido</span>
+
+                <strong>
+                    ${{ total_pedido }} CLP
+                </strong>
+            </div>
+
+            {% if pedido.metodo_pago == 'transferencia' %}
+
+                {% if pedido.estado_pago == 'confirmado' %}
+
+                    <p class="mensaje-pago">
+                        La transferencia bancaria fue confirmada
+                        por el personal autorizado de Masa Rica.
+                    </p>
+
+                {% elif pedido.estado_pago == 'en_verificacion' %}
+
+                    <p class="mensaje-pago">
+                        La transferencia bancaria está en proceso
+                        de verificación. El pago todavía no está confirmado.
+                    </p>
+
+                {% else %}
+
+                    <p class="mensaje-pago">
+                        El cliente seleccionó transferencia bancaria.
+                        El pago está pendiente de confirmación.
+                    </p>
+
+                    <p class="mensaje-pago">
+                        Antes de confirmar el pago, el personal autorizado
+                        debe comprobar que el dinero fue recibido
+                        en la cuenta bancaria de Masa Rica.
+                    </p>
+
+                {% endif %}
+
+                <div class="confirmacion-transferencia">
+
+                    <h3>Comprobante de transferencia</h3>
+
+                    {% with comprobante=pedido.comprobante_transferencia %}
+
+                        {% if comprobante %}
+
+                            <p class="mensaje-pago">
+                                El cliente ha enviado un comprobante
+                                de transferencia para este pedido.
+                            </p>
+
+                            <div class="campo">
+                                <span>Fecha de recepción</span>
+
+                                <strong>
+                                    {{ comprobante.fecha_subida|date:"d/m/Y H:i" }}
+                                </strong>
+                            </div>
+
+                            <div class="campo">
+                                <span>Archivo recibido</span>
+
+                                <strong>
+                                    Comprobante del pedido #{{ pedido.id }}
+                                </strong>
+                            </div>
+
+                            <a
+                                href="{% url 'descargar_comprobante_transferencia' pedido.id %}"
+                                class="boton-principal"
+                            >
+                                Descargar comprobante
+                            </a>
+
+                            <p class="mensaje-pago">
+                                Recibir un comprobante no significa
+                                que el pago esté confirmado.
+                                Debes revisar la cuenta bancaria
+                                y verificar que el dinero haya ingresado.
+                            </p>
+
+                        {% else %}
+
+                            <p class="mensaje-pago">
+                                El cliente todavía no ha enviado
+                                un comprobante de transferencia.
+                            </p>
+
+                            {% if pedido.estado_pago == 'en_verificacion' %}
+
+                                <p class="mensaje-pago">
+                                    El pago figura en verificación,
+                                    pero no hay un archivo asociado.
+                                    Revisa esta situación antes de confirmarlo.
+                                </p>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    {% endwith %}
+
+                </div>
+
+                {% if pedido.estado_pago != 'confirmado' and pedido.estado != 'cancelado' %}
+
+                    <div class="confirmacion-transferencia">
+
+                        <h3>
+                            Confirmación de transferencia bancaria
+                        </h3>
+
+                        <p class="mensaje-pago">
+                            Verifica en la cuenta bancaria de Masa Rica
+                            que se haya recibido el monto correspondiente.
+                            No confirmes el pago utilizando únicamente
+                            el comprobante enviado por el cliente.
+                        </p>
+
+                        <form
+                            method="post"
+                            action="{% url 'confirmar_pago_transferencia' pedido.id %}"
+                        >
+                            {% csrf_token %}
+
+                            <label for="confirmacion_transferencia">
+
+                                <input
+                                    type="checkbox"
+                                    id="confirmacion_transferencia"
+                                    name="confirmacion_transferencia"
+                                    value="confirmar"
+                                    required
+                                >
+
+                                <span>
+                                    Confirmo que revisé la cuenta bancaria
+                                    de Masa Rica y comprobé que el dinero
+                                    fue recibido correctamente.
+                                </span>
+
+                            </label>
+
+                            <button
+                                type="submit"
+                                class="boton-principal"
+                            >
+                                Confirmar pago recibido
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                {% elif pedido.estado == 'cancelado' and pedido.estado_pago != 'confirmado' %}
+
+                    <p class="mensaje-pago">
+                        Este pedido está cancelado.
+                        No se puede confirmar su pago.
+                    </p>
+
+                {% endif %}
+
+            {% elif pedido.metodo_pago == 'efectivo' %}
+
+                {% if pedido.estado_pago == 'confirmado' %}
+
+                    <p class="mensaje-pago" role="status">
+                        El pago en efectivo fue confirmado
+                        correctamente por el personal de Masa Rica.
+                    </p>
+
+                {% elif pedido.estado == 'cancelado' %}
+
+                    <p class="mensaje-pago">
+                        Este pedido fue cancelado.
+                        No es posible confirmar su pago.
+                    </p>
+
+                {% else %}
+
+                    <p class="mensaje-pago">
+                        El cliente seleccionó efectivo como
+                        método de pago. El pago todavía
+                        no ha sido confirmado.
+                    </p>
+
+                    <div class="confirmacion-transferencia">
+
+                        <h3>
+                            Confirmación de pago en efectivo
+                        </h3>
+
+                        <p class="mensaje-pago">
+                            Comprueba que recibiste el dinero
+                            correspondiente a este pedido antes
+                            de registrar el pago.
+                        </p>
+
+                        <form
+                            method="post"
+                            action="{% url 'confirmar_pago_efectivo' pedido.id %}"
+                        >
+                            {% csrf_token %}
+
+                            <label for="confirmacion_efectivo">
+
+                                <input
+                                    type="checkbox"
+                                    id="confirmacion_efectivo"
+                                    name="confirmacion_efectivo"
+                                    value="confirmar"
+                                    required
+                                >
+
+                                <span>
+                                    Confirmo que recibí en efectivo
+                                    el importe total de este pedido.
+                                </span>
+
+                            </label>
+
+                            <button
+                                type="submit"
+                                class="boton-principal"
+                            >
+                                Confirmar pago recibido
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                {% endif %}
+
+            {% elif pedido.metodo_pago == 'debito' or pedido.metodo_pago == 'credito' %}
+
+                <p class="mensaje-pago">
+                    Método de pago con tarjeta.
+                    Consulta el estado registrado
+                    antes de gestionar este pedido.
+                </p>
+
+            {% endif %}
+
+        </section>
+
+        <div class="acciones-finales-pedido">
+
+            <a
+                href="{% url 'pedidos_operia' %}"
+                class="boton-principal"
+            >
+                Volver al listado de pedidos
+            </a>
+
+            {% if request.user.is_superuser and pedido.estado != 'entregado' and pedido.estado_pago != 'confirmado' and pedido.estado_pago != 'en_verificacion' %}
+
+                <form
+                    method="post"
+                    action="{% url 'eliminar_pedido' pedido.id %}"
+                    onsubmit="return confirm('¿Estás seguro de eliminar el pedido #{{ pedido.id }}? Esta acción no se puede deshacer.');"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="boton-eliminar-pedido"
+                    >
+                        Eliminar pedido
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</body>
+</html>

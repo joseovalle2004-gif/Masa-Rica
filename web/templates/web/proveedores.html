@@ -1,0 +1,348 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#78221e">
+    <meta name="description" content="Administración de proveedores y compras de Masa Rica mediante Operia.">
+
+    <title>Gestión de proveedores | Masa Rica</title>
+
+    <link rel="stylesheet"
+          href="{% static 'web/css/proveedores.css' %}?v=3">
+</head>
+
+<body>
+
+    <header class="proveedores-barra">
+
+        <a href="{% url 'panel_operia' %}"
+           class="proveedores-marca"
+           aria-label="Operia, ir al panel principal">
+
+            <strong>Masa Rica</strong>
+
+        </a>
+
+        <nav class="proveedores-barra-acciones"
+             aria-label="Navegación principal">
+
+            <a href="{% url 'panel_operia' %}"
+               class="proveedores-enlace-panel">
+                Panel principal
+            </a>
+
+            <form method="post"
+                  action="{% url 'logout_operia' %}">
+
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="proveedores-salir">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </nav>
+
+    </header>
+
+    <main class="proveedores-contenido">
+
+        <section class="proveedores-introduccion"
+                 aria-labelledby="titulo-proveedores">
+
+            <p class="proveedores-etiqueta">
+                ADMINISTRACIÓN DE ABASTECIMIENTO
+            </p>
+
+            <h1 id="titulo-proveedores">
+                Gestión de proveedores
+            </h1>
+
+            <p>
+                Mantén organizada la información de los proveedores
+                de Masa Rica y supervisa el estado de las compras
+                necesarias para el funcionamiento del negocio.
+            </p>
+
+        </section>
+
+        {% if messages %}
+
+            <section class="proveedores-mensajes"
+                     aria-label="Notificaciones del sistema"
+                     aria-live="polite">
+
+                {% for message in messages %}
+
+                    <p role="status">
+                        {{ message }}
+                    </p>
+
+                {% endfor %}
+
+            </section>
+
+        {% endif %}
+
+        <section class="proveedores-resumen"
+                 aria-label="Indicadores de abastecimiento">
+
+            <article class="proveedores-tarjeta">
+
+                <h2>Proveedores activos</h2>
+
+                <p class="proveedores-valor">
+                    {{ total_proveedores }}
+                </p>
+
+                <span>
+                    Proveedores habilitados para realizar compras.
+                </span>
+
+            </article>
+
+            <article class="proveedores-tarjeta">
+
+                <h2>Órdenes pendientes</h2>
+
+                <p class="proveedores-valor">
+                    {{ ordenes_pendientes }}
+                </p>
+
+                <span>
+                    Órdenes que todavía esperan su recepción.
+                </span>
+
+            </article>
+
+            <article class="proveedores-tarjeta">
+
+                <h2>Entregas recibidas</h2>
+
+                <p class="proveedores-valor">
+                    {{ ordenes_recibidas }}
+                </p>
+
+                <span>
+                    Órdenes registradas como recibidas.
+                </span>
+
+            </article>
+
+        </section>
+
+        <section class="proveedores-seccion"
+                 aria-labelledby="titulo-registrar">
+
+            <div class="proveedores-encabezado">
+
+                <p class="proveedores-etiqueta">
+                    REGISTRO DE PROVEEDORES
+                </p>
+
+                <h2 id="titulo-registrar">
+                    Incorporar un proveedor
+                </h2>
+
+                <p>
+                    Completa los datos de identificación y contacto
+                    para agregar un nuevo proveedor al directorio.
+                </p>
+
+            </div>
+
+            <form method="post"
+                  action="{% url 'proveedores_operia' %}"
+                  class="proveedores-formulario">
+
+                {% csrf_token %}
+
+                {% if form_proveedor.non_field_errors %}
+
+                    <div class="proveedores-error"
+                         role="alert">
+                        {{ form_proveedor.non_field_errors }}
+                    </div>
+
+                {% endif %}
+
+                <div class="proveedores-formulario-grid">
+
+                    {% for campo in form_proveedor %}
+
+                        <div class="proveedores-campo">
+
+                            <label for="{{ campo.id_for_label }}">
+                                {{ campo.label }}
+                                {% if campo.field.required %}
+                                    <span aria-hidden="true">*</span>
+                                {% endif %}
+                            </label>
+
+                            {{ campo }}
+
+                            {% if campo.help_text %}
+                                <small>
+                                    {{ campo.help_text }}
+                                </small>
+                            {% endif %}
+
+                            {% if campo.errors %}
+
+                                <div class="proveedores-error"
+                                     role="alert">
+                                    {{ campo.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+                <button type="submit"
+                        class="proveedores-boton">
+                    Registrar proveedor
+                </button>
+
+            </form>
+
+        </section>
+
+        <section class="proveedores-seccion"
+                 aria-labelledby="titulo-directorio">
+
+            <div class="proveedores-encabezado">
+
+                <p class="proveedores-etiqueta">
+                    DIRECTORIO COMERCIAL
+                </p>
+
+                <h2 id="titulo-directorio">
+                    Proveedores registrados
+                </h2>
+
+                <p>
+                    Revisa los datos de contacto y la disponibilidad
+                    de los proveedores incorporados al sistema.
+                </p>
+
+            </div>
+
+            {% if proveedores %}
+
+                <div class="proveedores-tabla-contenedor"
+                     role="region"
+                     aria-label="Tabla de proveedores"
+                     tabindex="0">
+
+                    <table class="proveedores-tabla">
+
+                        <thead>
+                            <tr>
+                                <th scope="col">Proveedor</th>
+                                <th scope="col">RUT</th>
+                                <th scope="col">Contacto</th>
+                                <th scope="col">Teléfono</th>
+                                <th scope="col">Estado</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for proveedor in proveedores %}
+
+                                <tr>
+
+                                    <td>
+                                        <strong>
+                                            {{ proveedor.nombre }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        {{ proveedor.rut|default:"No registrado" }}
+                                    </td>
+
+                                    <td>
+                                        {{ proveedor.contacto|default:"Sin contacto" }}
+                                    </td>
+
+                                    <td>
+                                        {{ proveedor.telefono|default:"Sin teléfono" }}
+                                    </td>
+
+                                    <td>
+
+                                        {% if proveedor.activo %}
+
+                                            <span class="proveedores-estado activo">
+                                                Activo
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="proveedores-estado inactivo">
+                                                Inactivo
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            {% else %}
+
+                <div class="proveedores-vacio">
+
+                    <h3>No hay proveedores registrados</h3>
+
+                    <p>
+                        Cuando registres el primer proveedor,
+                        su información aparecerá en este directorio.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <a href="{% url 'panel_operia' %}"
+           class="proveedores-volver">
+            ← Volver al panel principal
+        </a>
+
+        <footer class="proveedores-pie">
+
+            <span>
+                Sistema de gestión de Masa Rica
+            </span>
+
+            <span>
+                © {% now "Y" %} Masa Rica
+            </span>
+
+        </footer>
+
+    </main>
+
+</body>
+</html>
